@@ -37,26 +37,6 @@ The page wraps `GPUDevice.createBuffer`, `GPUBuffer.destroy` and
 
 Per-mode tabs show the live-buffer histogram at the peak.
 
-## Run locally
-
-```bash
-npm install
-npm run dev
-```
-
-Open the Vite URL in Chrome or Edge with WebGPU enabled. The first session
-creation downloads the 741 MB model, so it takes a while.
-
-`npm run build` type-checks, regenerates the runtime bundles via
-`scripts/prepare-ort-bundles.mjs` (copies `ort.webgpu.min.mjs` into
-`public/ort-original/` unchanged and into `public/ort-patched/` with
-cache-mode forwarding injected), and builds the site.
-
-## GitHub Pages
-
-`.github/workflows/pages.yml` deploys `main`. Enable it once with
-Settings → Pages → Source: GitHub Actions.
-
 ## License
 
 MIT. The model is published separately by Musetric, also under MIT.
