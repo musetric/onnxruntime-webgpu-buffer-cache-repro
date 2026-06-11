@@ -7,6 +7,10 @@ bucket rounding is expensive. This page makes the cost visible.
 
 Live demo: <https://musetric.github.io/onnxruntime-webgpu-buffer-cache-repro/>
 
+Upstream issue: <https://github.com/microsoft/onnxruntime/issues/29016>
+
+Upstream PR: <https://github.com/microsoft/onnxruntime/pull/29017>
+
 ## What the page does
 
 It runs the same static-shape model twice per mode and compares:
