@@ -193,6 +193,12 @@ const render = (): void => {
               Repository:
               <a href="https://github.com/musetric/onnxruntime-webgpu-buffer-cache-repro" target="_blank" rel="noreferrer">musetric/onnxruntime-webgpu-buffer-cache-repro</a>
             </span>
+            <span class="metadata-line">
+              Upstream:
+              <a href="https://github.com/microsoft/onnxruntime/issues/29016" target="_blank" rel="noreferrer">issue #29016</a>
+              /
+              <a href="https://github.com/microsoft/onnxruntime/pull/29017" target="_blank" rel="noreferrer">PR #29017</a>
+            </span>
           </p>
         </div>
       </header>
