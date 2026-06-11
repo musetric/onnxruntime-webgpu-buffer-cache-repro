@@ -1,105 +1,62 @@
 # ONNX Runtime WebGPU Buffer Cache Repro
 
-Standalone repro for ONNX Runtime WebGPU buffer-cache VRAM overhead on the
-Musetric RoFormer vocal-separation model.
+The ONNX Runtime WebGPU EP supports several storage-buffer cache modes in its
+C++ core, but `onnxruntime-web` does not forward the option from JS, so web
+apps are pinned to the default `bucket` mode. For static-shape models the
+bucket rounding is expensive. This page makes the cost visible.
 
-The page compares two runs of the same static-shape model:
+Live demo: <https://musetric.github.io/onnxruntime-webgpu-buffer-cache-repro/>
 
-- `Official bucket`: `onnxruntime-web@1.26.0` with the default WebGPU EP storage
-  buffer cache mode.
-- `Patched simple`: the same `onnxruntime-web@1.26.0` browser bundle with JS
-  forwarding for `storageBufferCacheMode`, then
-  `storageBufferCacheMode: 'simple'`.
+## What the page does
 
-Both modes load `ort.webgpu.min.mjs` from `public/`: `ort-original/` is copied
-unchanged from npm, and `ort-patched/` is the same file with only the option
-forwarding patched in.
+It runs the same static-shape model twice per mode and compares:
 
-The model is not stored in this repository. It is downloaded from Hugging Face
-after the user starts a run:
+- `Official bucket` — `onnxruntime-web@1.26.0` as published (default cache
+  mode).
+- `Patched simple` — the same `ort.webgpu.min.mjs` with one line added to
+  forward `storageBufferCacheMode`, then `storageBufferCacheMode: 'simple'`.
 
-https://huggingface.co/musetric/vocal-separation-roformer-onnx
+The only difference between the modes is the forwarded option.
 
-## What It Measures
+Model: [Musetric RoFormer vocal separation](https://huggingface.co/musetric/vocal-separation-roformer-onnx)
+(fp16 weights, fp32 I/O `stft_repr` / `masks: [1, 2050, 1101, 2]`, 741 MB).
+It is downloaded from Hugging Face when a run starts and is not stored in this
+repository. The input is a deterministic random tensor.
 
-The page wraps:
+## What it measures
 
-- `GPUDevice.prototype.createBuffer`
-- `GPUBuffer.prototype.destroy`
-- `GPUQueue.prototype.submit`
+The page wraps `GPUDevice.createBuffer`, `GPUBuffer.destroy` and
+`GPUQueue.submit`, then reports per mode:
 
-For each mode it reports:
+- **Weights** — bytes still resident after session create (identical in both
+  modes).
+- **Peak live** — maximum bytes alive at any moment.
+- **Run 1 / Run 2 allocations** — new buffer bytes created during each run.
+  The model is static, so an ideal cache allocates nothing on run 2.
+- **Latency** per run and **submit count**.
 
-- weights: bytes still resident after session create (model weights; identical
-  in both modes, not affected by the cache option)
-- peak live bytes visible through the WebGPU API (weights + transient buffers)
-- live-buffer histogram at the peak
-- new allocation bytes during session creation, run 1, and run 2
-- run 1 and run 2 latency
-- submit count
+Per-mode tabs show the live-buffer histogram at the peak.
 
-The model input is a deterministic random tensor with shape:
-
-```text
-stft_repr: [1, 2050, 1101, 2] float32
-```
-
-The output is requested as a GPU buffer:
-
-```text
-masks: [1, 2050, 1101, 2] float32
-```
-
-## Local Run
+## Run locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the local Vite URL in Chrome or Edge with WebGPU enabled.
+Open the Vite URL in Chrome or Edge with WebGPU enabled. The first session
+creation downloads the 741 MB model, so it takes a while.
 
-The Hugging Face external data file is large, so the first session creation can
-take a while. The page does not download the model until a run button is clicked.
-
-## Build
-
-```bash
-npm run build
-```
-
-The build runs `scripts/prepare-ort-bundles.mjs`, which copies
-`node_modules/onnxruntime-web/dist/ort.webgpu.min.mjs` into two public folders:
-
-- `public/ort-original/` unchanged
-- `public/ort-patched/` with forwarding injected for:
-
-- `storageBufferCacheMode`
-- `uniformBufferCacheMode`
-- `queryResolveBufferCacheMode`
-- `defaultBufferCacheMode`
-
-The generated `public/ort-original/` and `public/ort-patched/` directories are
-intentionally ignored by Git.
+`npm run build` type-checks, regenerates the runtime bundles via
+`scripts/prepare-ort-bundles.mjs` (copies `ort.webgpu.min.mjs` into
+`public/ort-original/` unchanged and into `public/ort-patched/` with
+cache-mode forwarding injected), and builds the site.
 
 ## GitHub Pages
 
-This repository includes `.github/workflows/pages.yml`. After pushing to
-`main`, enable GitHub Pages with:
-
-```text
-Settings -> Pages -> Source: GitHub Actions
-```
-
-The Vite base path is configured for:
-
-```text
-/onnxruntime-webgpu-buffer-cache-repro/
-```
+`.github/workflows/pages.yml` deploys `main`. Enable it once with
+Settings → Pages → Source: GitHub Actions.
 
 ## License
 
-Code in this repository is MIT licensed. The repro model is published separately
-by Musetric under MIT:
-
-https://huggingface.co/musetric/vocal-separation-roformer-onnx
+MIT. The model is published separately by Musetric, also under MIT.
