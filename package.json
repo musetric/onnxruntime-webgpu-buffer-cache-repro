@@ -1,0 +1,21 @@
+{
+  "name": "onnxruntime-webgpu-buffer-cache-repro",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "check:ts": "tsc --noEmit",
+    "build": "tsc --noEmit && npm run prepare:ort-bundles && vite build",
+    "preview": "vite preview",
+    "prepare:ort-bundles": "node scripts/prepare-ort-bundles.mjs"
+  },
+  "dependencies": {
+    "@webgpu/types": "^0.1.64",
+    "onnxruntime-web": "1.26.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  }
+}
