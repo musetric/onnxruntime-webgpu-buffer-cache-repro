@@ -1,0 +1,7 @@
+node_modules/
+dist/
+public/ort-patched/
+public/ort-original/
+.vite/
+*.local
+vite-dev*.log
