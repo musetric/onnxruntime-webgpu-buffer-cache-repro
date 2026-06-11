@@ -185,9 +185,13 @@ const render = (): void => {
           <h1>WebGPU buffer cache repro</h1>
           <p class="lead">
             Compare official ONNX Runtime WebGPU bucket cache against patched storageBufferCacheMode: simple.
-            <span class="model-line">
+            <span class="metadata-line">
               Model:
               <a href="https://huggingface.co/musetric/vocal-separation-roformer-onnx" target="_blank" rel="noreferrer">Musetric RoFormer vocal separation</a>
+            </span>
+            <span class="metadata-line">
+              Repository:
+              <a href="https://github.com/musetric/onnxruntime-webgpu-buffer-cache-repro" target="_blank" rel="noreferrer">musetric/onnxruntime-webgpu-buffer-cache-repro</a>
             </span>
           </p>
         </div>
